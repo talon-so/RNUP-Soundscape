@@ -5,11 +5,9 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,29 +17,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.talons.RNUPSoundscape.R;
 import java.io.IOException;
-import java.util.Objects;
 
-import static android.support.v4.content.PermissionChecker.PERMISSION_DENIED;
 import static android.support.v4.content.PermissionChecker.checkSelfPermission;
 import static java.lang.Math.log10;
+import static java.lang.Math.max;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link RecordFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link RecordFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class RecordFragment extends Fragment implements View.OnClickListener{
 
 
     private static final int RECORD_AUDIO = 3 ;
     private static final int FINE_LOCATION = 5;
-    private OnFragmentInteractionListener mListener;
 
     public RecordFragment() {
         // Required empty public constructor
@@ -68,14 +55,14 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
     Button button;
     MediaRecorder recorder;
     View view;
-    TextView averageDecibels;
+    TextView textView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_record, container, false);
         button = view.findViewById(R.id.button);
         button.setOnClickListener(this);
-        averageDecibels = view.findViewById(R.id.decibels);
+        textView = view.findViewById(R.id.decibels);
         // Inflate the layout for this fragment
         return view;
     }
@@ -116,18 +103,27 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
             return true;
     }
 
+    /**
+     * @return db a double with the decibel value of the current intake of mic audio
+     */
     public double getAmplitude() {
         double db;
         if (recorder != null) {
-            db = 20.0 * log10( (recorder.getMaxAmplitude()) / 32767.0 );
-            return db;
+            db = 20.0 * log10( (recorder.getMaxAmplitude()));
+            // if db result is infinity return 0
+            if (db < 0) {
+                return 0;
+            }
+            return (double)Math.round(db * 100d) / 100d;
         }
         else
             return 0;
 
     }
 
-    /* Checks if external storage is available for read and write */
+    /**
+     *  Checks if external storage is available for read and write
+     *  */
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -142,6 +138,11 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
     }
 
     private int seconds = 10;
+    private int halfSeconds = 20;
+    private int tenthofSeconds = 100;
+    private int decibelAverage = 0;
+    private double totalDecibels = 0.0;
+    private double averageDecibels = 0.0;
     private void startRecording() {
         recorder = new MediaRecorder();
         //recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -171,21 +172,36 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
 
         recorder.start();
         button.setText("recording ");
+        // turn off button
+        button.setEnabled( false );
         // stop recording after 10 seconds
         final Handler handler = new Handler();
         handler.post( new Runnable() {
             @Override
             public void run() {
-                if (seconds > 0){
-                    button.setText( "recording " + seconds );
-                    averageDecibels.setText( Double.toString( getAmplitude()) );
-                    seconds--;
-                    handler.postDelayed(this,1000 );
+                if (tenthofSeconds > 0){
+                    if (tenthofSeconds < 99) {
+                     button.setText( "recording " + tenthofSeconds/10 );
+                    }
+                    Double maxAmplitude = getAmplitude();
+                    textView.setText( Double.toString( maxAmplitude) );
+                    totalDecibels += maxAmplitude;
+                    // subtract our counters
+                    tenthofSeconds--;
+
+                    handler.postDelayed(this,100 );
                 } else {
-                    button.setText( "calculating..." );
+                    button.setText( "ready to record " );
                     stopRecording();
                     // reset the recording seconds
                     seconds = 10;
+                    tenthofSeconds = 100;
+                    button.setEnabled( true );
+                    averageDecibels = totalDecibels/100;
+                    // switch into results fragment
+                    ((MainActivity) getActivity()).switchFragment( R.id.frame,DataFragment.newInstance(averageDecibels), "data" );
+                    totalDecibels = 0;
+                    averageDecibels = 0;
                 }
 
             }
@@ -224,20 +240,5 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
                 }
 
         }
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }

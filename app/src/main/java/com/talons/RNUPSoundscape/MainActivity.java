@@ -18,13 +18,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_main);
-        switchFragment(R.id.frame, new RecordFragment(), "record", "record frag");
+        switchFragment(R.id.frame, new RecordFragment(), "record");
     }
 
-    public void switchFragment(int frameId, Fragment fragment, String tag, String entryName) {
+    public void switchFragment(int frameId, Fragment fragment, String tag) {
         getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                 .replace(frameId, fragment, tag)
-                .addToBackStack(entryName)
+                .addToBackStack(tag)
                 .commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }
