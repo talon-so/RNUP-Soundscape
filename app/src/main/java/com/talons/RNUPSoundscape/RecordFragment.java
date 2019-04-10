@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import static android.support.v4.content.PermissionChecker.checkSelfPermission;
 import static java.lang.Math.log10;
@@ -181,17 +182,18 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
             public void run() {
                 if (tenthofSeconds > 0){
                     if (tenthofSeconds < 99) {
-                     button.setText( "recording " + tenthofSeconds/10 );
+                     button.setText( "Recording " + tenthofSeconds/10 );
                     }
                     Double maxAmplitude = getAmplitude();
-                    textView.setText( Double.toString( maxAmplitude) );
+                    DecimalFormat df = new DecimalFormat();
+                    df.setMaximumFractionDigits(2);
+                    df.setMinimumFractionDigits(2);
+                    textView.setText( df.format( maxAmplitude ));
                     totalDecibels += maxAmplitude;
                     // subtract our counters
                     tenthofSeconds--;
-
                     handler.postDelayed(this,100 );
                 } else {
-                    button.setText( "ready to record " );
                     stopRecording();
                     // reset the recording seconds
                     seconds = 10;
@@ -199,7 +201,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
                     button.setEnabled( true );
                     averageDecibels = totalDecibels/100;
                     // switch into results fragment
-                    ((MainActivity) getActivity()).switchFragment( R.id.frame,DataFragment.newInstance(averageDecibels), "data" );
+                    ((MainActivity) getActivity()).switchFragment( R.id.frame,DataFragment.newInstance(averageDecibels), "data", true);
                     totalDecibels = 0;
                     averageDecibels = 0;
                 }
