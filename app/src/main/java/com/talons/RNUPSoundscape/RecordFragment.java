@@ -149,18 +149,19 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         //recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         AudioManager audioManager = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
         // get unprocessed mic data if applicable (API24 and above on some device)
-        if(audioManager.getProperty(AudioManager.PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED) !=null)
-            recorder.setAudioSource(MediaRecorder.AudioSource.UNPROCESSED);
-        else
+        if(audioManager.getProperty(AudioManager.PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED) !=null) {
+            recorder.setAudioSource( MediaRecorder.AudioSource.UNPROCESSED );
+            Log.i( "mic used", "unprocessed" );
+        } else {
             // use voice recognition, closest thing to clean audio
-            recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION);
-
+            recorder.setAudioSource( MediaRecorder.AudioSource.VOICE_RECOGNITION);
+            Log.i( "mic used", "voice recognition" );
+        }
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         Log.i("File Path: ", getActivity().getExternalCacheDir().getAbsolutePath());
         if (isExternalStorageWritable()){
         recorder.setOutputFile(getActivity().getExternalCacheDir().getAbsolutePath() + "/temp");
-        }else
-        {
+        } else {
             Log.e("File Path: ", "external cache not available");
         }
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
@@ -234,10 +235,9 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.ACCESS_FINE_LOCATION
                 };
-
                 if(!checkPermissions(PERMISSIONS)){
                     requestPermissions(PERMISSIONS, PERMISSION_ALL);
-                }else {
+                } else {
                     startRecording();
                 }
 

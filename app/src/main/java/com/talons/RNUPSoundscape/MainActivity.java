@@ -1,75 +1,100 @@
 package com.talons.RNUPSoundscape;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 
-import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.Point;
+import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
-import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.talons.RNUPSoundscape.R.layout;
 
+import java.security.Permissions;
 
-public class MainActivity extends AppCompatActivity {
+import static com.talons.RNUPSoundscape.RecordFragment.PERMISSION_ALL;
+
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private MapView mapView;
+    private MapboxMap mapboxMap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         Mapbox.getInstance(this, "pk.eyJ1IjoidGFsb25zIiwiYSI6ImNqdWJlZnVydzBja280ZG8wZGdudzg4eHAifQ.otRVfoYaj-CF_5yPZqJjjQ");
         setContentView(layout.activity_main);
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-        loadMap();
+        mapView.getMapAsync(this);
 
         switchFragment(R.id.frame, new RecordFragment(), "record", false);
+
     }
 
-    public void loadMap(){
+    public boolean checkPermissions( String[] permissions){
+        if (permissions != null) {
+                for (String permission : permissions) {
+                if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+    @Override
+    public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+        MainActivity.this.mapboxMap = mapboxMap;
 
-                mapboxMap.setStyle(Style.LIGHT, new Style.OnStyleLoaded() {
+        mapboxMap.setStyle(new Style.Builder().fromUrl("mapbox://styles/mapbox/cjerxnqt3cgvp2rmyuxbeqme7"),
+                new Style.OnStyleLoaded() {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
-                        // Add the marker image to map
-                        style.addImage("marker-icon-id",
-                                BitmapFactory.decodeResource(
-                                        MainActivity.this.getResources(), R.drawable.mapbox_marker_icon_default));
-
-                        GeoJsonSource geoJsonSource = new GeoJsonSource("source-id", Feature.fromGeometry(
-                                Point.fromLngLat(-87.679, 41.885)));
-                        style.addSource(geoJsonSource);
-
-                        SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
-                        symbolLayer.withProperties(
-                                PropertyFactory.iconImage("marker-icon-id")
-                        );
-                        style.addLayer(symbolLayer);
-
+                        enableLocationComponent(style);
                     }
                 });
-            }
-        });
     }
+    @SuppressWarnings( {"MissingPermission"})
+    private void enableLocationComponent(@NonNull Style loadedMapStyle) {
+        // Check if permissions are enabled and if not request
+        String[] PERMISSIONS = {
+                Manifest.permission.ACCESS_FINE_LOCATION };
+        if (checkPermissions( PERMISSIONS)) {
+        // Get an instance of the component
+            LocationComponent locationComponent = mapboxMap.getLocationComponent();
 
+        // Activate with options
+            locationComponent.activateLocationComponent(
+                    LocationComponentActivationOptions.builder(this, loadedMapStyle).build());
+
+        // Enable to make component visible
+            locationComponent.setLocationComponentEnabled(true);
+
+        // Set the component's camera mode
+            locationComponent.setCameraMode(CameraMode.TRACKING);
+        // Set the component's render mode
+            locationComponent.setRenderMode(RenderMode.COMPASS);
+            mapboxMap.animateCamera( CameraUpdateFactory
+                    .newCameraPosition(position), 600);
+        } else {
+            requestPermissions(PERMISSIONS, PERMISSION_ALL);
+        }
+    }
     // Add the mapView's own lifecycle methods to the activity's lifecycle methods
     @Override
     public void onStart() {
@@ -126,6 +151,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
+            super.onBackPressed();
+            super.onBackPressed();
+        }else
+            super.onBackPressed();
     }
 }
