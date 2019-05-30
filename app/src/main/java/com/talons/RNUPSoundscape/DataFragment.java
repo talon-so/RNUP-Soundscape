@@ -1,9 +1,8 @@
 package com.talons.RNUPSoundscape;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ public class DataFragment extends Fragment {
      * @param averageDecibels the average decibels of a 10 second recording from RecordFragment
      * @return A new instance of fragment DataFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static DataFragment newInstance(double averageDecibels) {
         DataFragment fragment = new DataFragment();
         Bundle args = new Bundle();

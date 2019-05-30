@@ -8,8 +8,8 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +20,17 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
-import static android.support.v4.content.PermissionChecker.checkSelfPermission;
+import static androidx.core.content.PermissionChecker.checkSelfPermission;
 import static java.lang.Math.log10;
 import static java.lang.Math.max;
 
 
 public class RecordFragment extends Fragment implements View.OnClickListener{
 
+    RecordingCompleteCallback callback;
+    public interface RecordingCompleteCallback {
+        void OnComplete(double averageDecibels) throws IOException;
+    }
 
     private static final int RECORD_AUDIO = 3 ;
     private static final int FINE_LOCATION = 5;
@@ -64,6 +68,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         button = view.findViewById(R.id.button);
         button.setOnClickListener(this);
         textView = view.findViewById(R.id.decibels);
+        callback = (RecordingCompleteCallback) getContext();
         // Inflate the layout for this fragment
         return view;
     }
@@ -183,7 +188,13 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
             public void run() {
                 if (tenthofSeconds > 0){
                     if (tenthofSeconds < 99) {
-                     button.setText( "Recording " + tenthofSeconds/10 );
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // UI updation related code.
+                                button.setText( "Recording " + tenthofSeconds/10 );
+                            }
+                        });
                     }
                     Double maxAmplitude = getAmplitude();
                     DecimalFormat df = new DecimalFormat();
@@ -201,8 +212,13 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
                     tenthofSeconds = 100;
                     button.setEnabled( true );
                     averageDecibels = totalDecibels/100;
-                    // switch into results fragment
-                    ((MainActivity) getActivity()).switchFragment( R.id.frame,DataFragment.newInstance(averageDecibels), "data", true);
+                    // notify activity
+                    try {
+                        Log.i("decibels", "total: " + totalDecibels +  " average: " + averageDecibels);
+                        callback.OnComplete( averageDecibels );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     totalDecibels = 0;
                     averageDecibels = 0;
                 }
