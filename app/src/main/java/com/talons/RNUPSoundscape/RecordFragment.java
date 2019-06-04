@@ -29,7 +29,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
 
     RecordingCompleteCallback callback;
     public interface RecordingCompleteCallback {
-        void OnComplete(double averageDecibels) throws IOException;
+        void onRecordComplete(double averageDecibels) throws IOException;
     }
 
     private static final int RECORD_AUDIO = 3 ;
@@ -215,7 +215,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
                     // notify activity
                     try {
                         Log.i("decibels", "total: " + totalDecibels +  " average: " + averageDecibels);
-                        callback.OnComplete( averageDecibels );
+                        callback.onRecordComplete( averageDecibels );
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -239,6 +239,11 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         }
     }
 
+    String[] PERMISSIONS = {
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
     // record time at 10 seconds
     private static final int RECORD_TIME = 10000;
     @Override
@@ -246,11 +251,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         switch (v.getId()) {
             case R.id.button:
                 Log.i( "boop","record pressed" );
-                String[] PERMISSIONS = {
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                };
+
                 if(!checkPermissions(PERMISSIONS)){
                     requestPermissions(PERMISSIONS, PERMISSION_ALL);
                 } else {

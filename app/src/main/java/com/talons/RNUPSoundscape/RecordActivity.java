@@ -1,15 +1,17 @@
 package com.talons.RNUPSoundscape;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -28,14 +30,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.jaredrummler.android.device.DeviceName;
 import com.talons.RNUPSoundscape.R.layout;
 
-import static com.talons.RNUPSoundscape.RecordFragment.PERMISSION_ALL;
+import java.lang.reflect.Field;
 
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, RecordFragment.RecordingCompleteCallback {
+public class RecordActivity extends AppCompatActivity implements OnMapReadyCallback, RecordFragment.RecordingCompleteCallback, View.OnClickListener {
 
-    private MapView mapView;
+    private Button viewCollectedData;
     private GoogleMap map;
     //private GoogleMapsClient mapsClient;
     private FusedLocationProviderClient fusedLocationClient;
@@ -49,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        viewCollectedData = findViewById( R.id.view_collected_data);
+        viewCollectedData.setOnClickListener( this );
         switchFragment(R.id.frame, new RecordFragment(), "record", false);
 
     }
@@ -63,7 +68,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Log.e("error", String.valueOf( e ) );
         }
     }
-
+    private double lastLatitude = 0.0;
+    private double lastLongitude = 0.0;
     private LatLng currLatLng;
     /**
      * centers map on location maintaining the current level of map zoom
@@ -81,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         // get zoom level to keep same level of zoom as maps current
                         float zoomLevel = map.getCameraPosition().zoom;
                         currLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                        lastLatitude = location.getLatitude();
+                        lastLongitude = location.getLongitude();
                         map.animateCamera(CameraUpdateFactory.newLatLngZoom(currLatLng, zoomLevel));
                     }
                 }
@@ -88,18 +96,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public boolean checkPermissions( String[] permissions){
-        if (permissions != null) {
-                for (String permission : permissions) {
-                if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    // Add the mapView's own lifecycle methods to the activity's lifecycle methods
     @Override
     public void onStart() {
         super.onStart();
@@ -180,10 +176,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             super.onBackPressed();
     }
 
-
+    public String getVersionName(){
+        Field[] fields = Build.VERSION_CODES.class.getFields();
+        String osName = fields[Build.VERSION.SDK_INT + 1].getName();
+        return osName;
+    }
     @Override
-    public void OnComplete(double averageDecibels) {
-        switchFragment( R.id.frame,DataFragment.newInstance(averageDecibels), "data", true);
+    public void onRecordComplete(double averageDecibels) {
+        centerOnLocation();
+        String deviceName = DeviceName.getDeviceName();
+        StorageModel unit = new StorageModel( averageDecibels, lastLatitude, lastLongitude, deviceName, getVersionName(), System.currentTimeMillis()/1000 );
+        switchFragment( R.id.frame, CurrentDataFragment.newInstance(unit), "data", false);
     }
 
     @Override
@@ -221,16 +224,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             map.getUiSettings().setMyLocationButtonEnabled(true);
             centerOnLocation();
+
+            map.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener(){
+                @Override
+                public boolean onMyLocationButtonClick() {
+                    centerOnLocation();
+                    return true;
+                }
+            });
         } else {
             // Show rationale and request permission.
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, permission);
         }
-        map.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener(){
-            @Override
-            public boolean onMyLocationButtonClick() {
-                centerOnLocation();
-                return true;
-            }
-        });
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()){
+            case(R.id.view_collected_data):
+                Intent intent = new Intent(this, DataActivity.class);
+                startActivity(intent);
+                break;
+        }
     }
 }

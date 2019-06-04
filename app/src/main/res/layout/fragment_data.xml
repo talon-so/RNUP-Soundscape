@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="240dp"
     android:background="#F8F8FF"
-    tools:context=".DataFragment">
+    tools:context=".CurrentDataFragment">
 
     <TextView
         android:layout_width="match_parent"
@@ -19,4 +19,22 @@
         android:text="0"
         android:textSize="100dp"/>
 
+    <RelativeLayout
+        android:elevation="3dp"
+        android:layout_alignParentRight="true"
+        android:background="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/save"
+            android:padding="12dp"
+            android:textColor="@color/black"
+            android:textSize="10dp"
+            android:text="Save to Collection"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
 </RelativeLayout>
