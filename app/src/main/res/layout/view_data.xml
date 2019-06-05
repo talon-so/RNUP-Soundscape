@@ -6,7 +6,7 @@
     android:background="#F8F8FF"
     android:paddingTop="12dp"
     android:paddingBottom="12dp"
-    tools:context=".CurrentDataFragment">
+    tools:context=".record.CurrentDataFragment">
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

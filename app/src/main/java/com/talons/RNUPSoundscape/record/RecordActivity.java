@@ -1,4 +1,4 @@
-package com.talons.RNUPSoundscape;
+package com.talons.RNUPSoundscape.record;
 
 import android.Manifest;
 import android.content.Intent;
@@ -23,22 +23,23 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.jaredrummler.android.device.DeviceName;
+import com.talons.RNUPSoundscape.R;
 import com.talons.RNUPSoundscape.R.layout;
+import com.talons.RNUPSoundscape.viewdata.DataActivity;
+import com.talons.RNUPSoundscape.sessiontools.StorageModel;
 
 import java.lang.reflect.Field;
 
 
 public class RecordActivity extends AppCompatActivity implements OnMapReadyCallback, RecordFragment.RecordingCompleteCallback, View.OnClickListener {
 
-    private Button viewCollectedData;
+    Button viewCollectedData;
     private GoogleMap map;
     //private GoogleMapsClient mapsClient;
     private FusedLocationProviderClient fusedLocationClient;
@@ -49,9 +50,8 @@ public class RecordActivity extends AppCompatActivity implements OnMapReadyCallb
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         setContentView(layout.activity_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById( R.id.map);
         mapFragment.getMapAsync(this);
-
         viewCollectedData = findViewById( R.id.view_collected_data);
         viewCollectedData.setOnClickListener( this );
         switchFragment(R.id.frame, new RecordFragment(), "record", false);
@@ -196,10 +196,8 @@ public class RecordActivity extends AppCompatActivity implements OnMapReadyCallb
         setMapPadding( 0,0,0,Math.round(this
                 .getResources().getDimension(R.dimen.map_padding_bottom)));
         requestMyLocationPermission();
+        centerOnLocation();
         // Add a marker in Sydney, Australia, and move the camera.
-        LatLng sydney = new LatLng(-34, 151);
-        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        map.moveCamera( CameraUpdateFactory.newLatLng(sydney));
     }
 
     public void requestMyLocationPermission(){

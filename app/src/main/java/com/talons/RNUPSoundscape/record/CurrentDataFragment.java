@@ -1,4 +1,4 @@
-package com.talons.RNUPSoundscape;
+package com.talons.RNUPSoundscape.record;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,21 +11,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.talons.RNUPSoundscape.R;
+import com.talons.RNUPSoundscape.sessiontools.Serializer;
+import com.talons.RNUPSoundscape.sessiontools.SessionManager;
+import com.talons.RNUPSoundscape.sessiontools.StorageModel;
+
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.StandardProtocolFamily;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class CurrentDataFragment extends Fragment implements View.OnClickListener {
-    private static final String ARG_PARAM1 = "decibel_average";
+    private static final String ARG_PARAM1 = "unit";
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
-     * @param averageDecibels the average decibels of a 10 second recording from RecordFragment
      * @return A new instance of fragment CurrentDataFragment.
      */
     public static CurrentDataFragment newInstance(StorageModel unit) {
@@ -35,8 +37,6 @@ public class CurrentDataFragment extends Fragment implements View.OnClickListene
         fragment.setArguments( args );
         return fragment;
     }
-
-    private double averageDecibels;
     private Button save;
     private Serializer serializer;
     private SessionManager sessionManager;
@@ -76,20 +76,18 @@ public class CurrentDataFragment extends Fragment implements View.OnClickListene
         super.onAttach( context );
     }
 
-    public List<StorageModel> getDatabase() {
+    private List<StorageModel> getDatabase() {
         try {
             if(sessionManager.getDatabase() != null){
             String serializedDatabase = sessionManager.getDatabase();
             return (List<StorageModel>) serializer.deserialize(serializedDatabase);
-            } else {
-              return new ArrayList<StorageModel>();
             }
         } catch (IOException e) {
             Log.e("IOException", String.valueOf( e ) );
         } catch (ClassNotFoundException e) {
             Log.e("ClassNotFoundException", String.valueOf( e ) );
         }
-        return null;
+        return new ArrayList<StorageModel>();
     }
 
     public void updateDatabase(StorageModel unit) {
@@ -112,6 +110,7 @@ public class CurrentDataFragment extends Fragment implements View.OnClickListene
             case(R.id.save):
                 updateDatabase( unit );
                 save.setText( "Saved!" );
+                save.setOnClickListener( null );
         }
 
     }

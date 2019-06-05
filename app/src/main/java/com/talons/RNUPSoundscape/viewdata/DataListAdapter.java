@@ -1,24 +1,29 @@
-package com.talons.RNUPSoundscape;
+package com.talons.RNUPSoundscape.viewdata;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import java.util.List;
 
+import com.talons.RNUPSoundscape.R;
+import com.talons.RNUPSoundscape.sessiontools.StorageModel;
+
+import java.util.List;
 
 public class DataListAdapter extends RecyclerView.Adapter<DataViewHolder> {
     private static final int LIST_OBJ = R.layout.view_data;
     private List<StorageModel> data;
 
-    public DataListAdapter(List<StorageModel> data) {
+    DataListAdapter(List<StorageModel> data) {
         this.data = data;
     }
 
     @Override
     public int getItemViewType(int position) {
-            return LIST_OBJ;
+        return LIST_OBJ;
     }
 
     @Override

@@ -1,9 +1,7 @@
-package com.talons.RNUPSoundscape;
+package com.talons.RNUPSoundscape.sessiontools;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import java.util.List;
 
 public class SessionManager {
 

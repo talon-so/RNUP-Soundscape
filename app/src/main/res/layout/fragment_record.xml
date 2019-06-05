@@ -8,7 +8,7 @@
     android:background="#F8F8FF"
     android:clickable="true"
     android:focusable="true"
-    tools:context=".RecordFragment">
+    tools:context=".record.RecordFragment">
 
     <Button
         android:textColor="@color/black"

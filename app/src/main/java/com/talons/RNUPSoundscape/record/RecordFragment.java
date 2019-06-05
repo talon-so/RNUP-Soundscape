@@ -1,4 +1,4 @@
-package com.talons.RNUPSoundscape;
+package com.talons.RNUPSoundscape.record;
 
 import android.Manifest;
 import android.content.Context;
@@ -17,12 +17,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.talons.RNUPSoundscape.R;
+
 import java.io.IOException;
 import java.text.DecimalFormat;
 
 import static androidx.core.content.PermissionChecker.checkSelfPermission;
 import static java.lang.Math.log10;
-import static java.lang.Math.max;
+
 
 
 public class RecordFragment extends Fragment implements View.OnClickListener{
@@ -34,10 +36,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
 
     private static final int RECORD_AUDIO = 3 ;
     private static final int FINE_LOCATION = 5;
-
-    public RecordFragment() {
-        // Required empty public constructor
-    }
 
     /**
      * Use this factory method to create a new instance of
@@ -64,7 +62,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_record, container, false);
+        view = inflater.inflate( R.layout.fragment_record, container, false);
         button = view.findViewById(R.id.button);
         button.setOnClickListener(this);
         textView = view.findViewById(R.id.decibels);
@@ -177,6 +175,8 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
             Log.e("prepare() failed", String.valueOf(e));
         }
 
+        ((RecordActivity)getActivity()).viewCollectedData.setOnClickListener( null );
+
         recorder.start();
         button.setText("recording ");
         // turn off button
@@ -236,6 +236,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         } finally {
             recorder.release();
             recorder = null;
+            ((RecordActivity)getActivity()).viewCollectedData.setOnClickListener( (View.OnClickListener) getActivity() );
         }
     }
 
