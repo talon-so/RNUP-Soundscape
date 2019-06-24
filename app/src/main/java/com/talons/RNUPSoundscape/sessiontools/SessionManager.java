@@ -14,6 +14,7 @@ public class SessionManager {
     private static final String PREF_NAME = "AndroidHivePref";
 
     private static final String KEY_DATABASE = "keepitasecret";
+    private static final String KEY_AMPLITUDE_REF = "lilnuggets";
 
     // Constructor
     public SessionManager(Context context){
@@ -32,6 +33,15 @@ public class SessionManager {
     }
 
 
+    public int getAmplitudeRef() {
+        return pref.getInt(KEY_AMPLITUDE_REF, 0);
+    }
+
+
+    public void setAmplitudeRef(int amplitudeRef){
+        editor.putInt(KEY_AMPLITUDE_REF, amplitudeRef);
+        editor.commit();
+    }
 
 
 

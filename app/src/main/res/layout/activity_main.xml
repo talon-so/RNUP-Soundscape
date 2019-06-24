@@ -15,7 +15,7 @@
      android:id="@+id/map"
      tools:context=".MapsActivity"
      android:name="com.google.android.gms.maps.SupportMapFragment"
-     map:cameraZoom="16"/>
+     map:cameraZoom="12"/>
 A
  <FrameLayout
      android:paddingTop="3dp"

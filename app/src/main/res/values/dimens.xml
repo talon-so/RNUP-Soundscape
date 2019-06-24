@@ -1,4 +1,4 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="map_padding_bottom">240dp</dimen>
+    <dimen name="map_padding_bottom">300dp</dimen>
 </resources>

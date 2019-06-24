@@ -1,16 +1,13 @@
-package com.talons.RNUPSoundscape.record;
+package com.talons.RNUPSoundscape.calibrate;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,11 +16,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.talons.RNUPSoundscape.R;
-import com.talons.RNUPSoundscape.calibrate.CalibrationActivity;
+import com.talons.RNUPSoundscape.record.RecordActivity;
 import com.talons.RNUPSoundscape.sessiontools.Serializer;
 import com.talons.RNUPSoundscape.sessiontools.SessionManager;
-import com.talons.RNUPSoundscape.viewdata.DataActivity;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -33,13 +32,7 @@ import static androidx.core.content.PermissionChecker.checkSelfPermission;
 import static java.lang.Math.log10;
 
 
-
-public class RecordFragment extends Fragment implements View.OnClickListener{
-
-    RecordingCompleteCallback callback;
-    public interface RecordingCompleteCallback {
-        void onRecordComplete(double averageDecibels) throws IOException;
-    }
+public class CalibrationFragment extends Fragment implements View.OnClickListener{
 
     private static final int RECORD_AUDIO = 3 ;
     private static final int FINE_LOCATION = 5;
@@ -50,8 +43,8 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
      *
      * @return A new instance of fragment RecordFragment.
      */
-    public static RecordFragment newInstance() {
-        RecordFragment fragment = new RecordFragment();
+    public static CalibrationFragment newInstance() {
+        CalibrationFragment fragment = new CalibrationFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -66,27 +59,30 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         sessionManager = new SessionManager( Objects.requireNonNull( getContext() ) );
     }
 
-    ImageButton calibrateBtn;
-    Button recordBtn;
     MediaRecorder recorder;
     View view;
     TextView textView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate( R.layout.fragment_record, container, false);
+        view = inflater.inflate( R.layout.fragment_calibrate, container, false);
         setOnClickListeners();
         textView = view.findViewById(R.id.decibels);
-        callback = (RecordingCompleteCallback) getContext();
+        constantTextview = view.findViewById( R.id.constant_textview );
+        startCalibration();
         // Inflate the layout for this fragment
         return view;
     }
 
+    ImageButton  addBtn, subtractBtn;
+    Button calibrateBtn;
     public void setOnClickListeners(){
-        recordBtn = view.findViewById(R.id.button);
-        recordBtn.setOnClickListener(this);
-        calibrateBtn = view.findViewById(R.id.calibration_button);
-        calibrateBtn.setOnClickListener(this);
+        calibrateBtn = view.findViewById(R.id.finish_button);
+        calibrateBtn.setOnClickListener( this );
+        addBtn = view.findViewById( R.id.add );
+        addBtn.setOnClickListener( this );
+        subtractBtn = view.findViewById( R.id.subtract);
+        subtractBtn.setOnClickListener( this );
     }
     @Override
     public void onAttach(Context context) {
@@ -105,7 +101,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode){
             case PERMISSION_ALL:
-                startRecording();
+                startCalibration();
                 break;
                 default:
                     break;
@@ -158,14 +154,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         super.onPause();
     }
 
-    private int seconds = 10;
-    private int halfSeconds = 20;
-    private int tenthofSeconds = 100;
-    private int decibelAverage = 0;
-    private double totalDecibels = 0.0;
-    private double averageDecibels = 0.0;
-    private void startRecording() {
-        calibrateBtn.setOnClickListener( null );
+    private void startCalibration(){
         recorder = new MediaRecorder();
         //recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         AudioManager audioManager = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
@@ -181,7 +170,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         Log.i("File Path: ", getActivity().getExternalCacheDir().getAbsolutePath());
         if (isExternalStorageWritable()){
-        recorder.setOutputFile(getActivity().getExternalCacheDir().getAbsolutePath() + "/temp");
+            recorder.setOutputFile(getActivity().getExternalCacheDir().getAbsolutePath() + "/temp/");
         } else {
             Log.e("File Path: ", "external cache not available");
         }
@@ -192,59 +181,33 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         } catch (IOException e) {
             Log.e("prepare() failed", String.valueOf(e));
         }
-
-        ((RecordActivity)getActivity()).viewCollectedData.setOnClickListener( null );
         recorder.start();
-        // turn off recordBtn
-        recordBtn.setEnabled( false );
-        // stop recording after 10 seconds
+
         final Handler handler = new Handler();
         handler.post( new Runnable() {
             @Override
             public void run() {
-                if (tenthofSeconds > 0){
-                    if (tenthofSeconds < 99) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // UI updation related code.
-                                recordBtn.setText( "Recording " + tenthofSeconds/10 );
-                            }
-                        });
-                    }
-                    Double maxAmplitude = getAmplitude() + sessionManager.getAmplitudeRef();
-                    DecimalFormat df = new DecimalFormat();
-                    df.setMaximumFractionDigits(2);
-                    df.setMinimumFractionDigits(2);
-                    textView.setText( df.format( maxAmplitude ));
-                    totalDecibels += maxAmplitude;
-                    // subtract our counters
-                    tenthofSeconds--;
-                    handler.postDelayed(this,100 );
-                } else {
-                    stopRecording();
-                    // reset the recording seconds
-                    seconds = 10;
-                    tenthofSeconds = 100;
-                    recordBtn.setEnabled( true );
-                    averageDecibels = totalDecibels/100;
-                    // notify activity
-                    try {
-                        Log.i("decibels", "total: " + totalDecibels +  " average: " + averageDecibels);
-                        callback.onRecordComplete( averageDecibels );
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    totalDecibels = 0;
-                    averageDecibels = 0;
-                }
-
+                Double maxAmplitude = getAmplitude() + calibrationConstant ;
+                DecimalFormat df = new DecimalFormat();
+                df.setMaximumFractionDigits( 2 );
+                df.setMinimumFractionDigits( 2 );
+                textView.setText( df.format( maxAmplitude ) );
+                handler.postDelayed( this, 100 );
             }
-        } );
+        });
+    }
+
+    public void onBackPressed() {
+        stopCalibration();
+        getActivity().finish();
 
     }
 
-    private void stopRecording() {
+    public void updateAmplitudeReference(int calibrationConstant) {
+            sessionManager.setAmplitudeRef( calibrationConstant );
+    }
+
+    public void stopCalibration() {
         try {
             recorder.stop();
         } catch(RuntimeException e) {
@@ -253,29 +216,29 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
             recorder.reset();    // set state to idle
             recorder.release();  // release resources back to the system
             recorder = null;
-            ((RecordActivity) getActivity()).viewCollectedData.setOnClickListener( (View.OnClickListener) getActivity() );
-            calibrateBtn.setOnClickListener( this );
+            updateAmplitudeReference( calibrationConstant );
         }
-       }
 
-    private String[] PERMISSIONS = {
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-    };
-
+    }
+    TextView constantTextview;
+    public void updateConstantTextView(){
+        constantTextview.setText( Integer.toString(calibrationConstant) );
+    }
+    int calibrationConstant = 0;
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.button:
-                    if (!checkPermissions( PERMISSIONS )) {
-                        requestPermissions( PERMISSIONS, PERMISSION_ALL );
-                    } else {
-                        startRecording();
-                    }
+            case R.id.finish_button:
+                   stopCalibration();
+                   getActivity().finish();
+               break;
+            case R.id.add:
+                calibrationConstant++;
+                updateConstantTextView();
                 break;
-            case R.id.calibration_button:
-                Intent intent = new Intent(getContext(), CalibrationActivity.class);
-                startActivity(intent);
+            case R.id.subtract:
+                calibrationConstant--;
+                updateConstantTextView();
                 break;
         }
     }

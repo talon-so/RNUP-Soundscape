@@ -46,6 +46,8 @@ public class RecordActivity extends AppCompatActivity implements OnMapReadyCallb
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Show rationale and request permission.
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         //mapsClient = GoogleMapsServiceGenerator.createService(GoogleMapsClient.class);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         setContentView(layout.activity_main);
@@ -96,41 +98,6 @@ public class RecordActivity extends AppCompatActivity implements OnMapReadyCallb
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
     /**
      * set map style by loading a json resource file into the map
      * @param googleMap is the fragments map to set style on
@@ -178,14 +145,14 @@ public class RecordActivity extends AppCompatActivity implements OnMapReadyCallb
 
     public String getVersionName(){
         Field[] fields = Build.VERSION_CODES.class.getFields();
-        String osName = fields[Build.VERSION.SDK_INT + 1].getName();
+        String osName = fields[Build.VERSION.SDK_INT].getName();
         return osName;
     }
     @Override
     public void onRecordComplete(double averageDecibels) {
         centerOnLocation();
         String deviceName = DeviceName.getDeviceName();
-        StorageModel unit = new StorageModel( averageDecibels, lastLatitude, lastLongitude, deviceName, getVersionName(), System.currentTimeMillis()/1000 );
+        StorageModel unit = new StorageModel( averageDecibels, lastLatitude, lastLongitude, deviceName, Integer.toString(Build.VERSION.SDK_INT), System.currentTimeMillis()/1000 );
         switchFragment( R.id.frame, CurrentDataFragment.newInstance(unit), "data", false);
     }
 
@@ -195,9 +162,7 @@ public class RecordActivity extends AppCompatActivity implements OnMapReadyCallb
         setMapStyling( map );
         setMapPadding( 0,0,0,Math.round(this
                 .getResources().getDimension(R.dimen.map_padding_bottom)));
-        requestMyLocationPermission();
         centerOnLocation();
-        // Add a marker in Sydney, Australia, and move the camera.
     }
 
     public void requestMyLocationPermission(){
@@ -209,7 +174,7 @@ public class RecordActivity extends AppCompatActivity implements OnMapReadyCallb
             View mapView = findViewById( R.id.map );
             if (mapView != null &&
                     mapView.findViewById(Integer.parseInt("1")) != null) {
-                // Get the button view
+                // Get the recordBtn view
                 View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
                 // and next place it, on bottom right (as Google Maps app)
                 RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
@@ -222,7 +187,6 @@ public class RecordActivity extends AppCompatActivity implements OnMapReadyCallb
 
             map.getUiSettings().setMyLocationButtonEnabled(true);
             centerOnLocation();
-
             map.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener(){
                 @Override
                 public boolean onMyLocationButtonClick() {
@@ -234,6 +198,7 @@ public class RecordActivity extends AppCompatActivity implements OnMapReadyCallb
             // Show rationale and request permission.
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, permission);
         }
+
     }
 
     @Override
