@@ -21,9 +21,8 @@ import android.widget.TextView;
 
 import com.talons.RNUPSoundscape.R;
 import com.talons.RNUPSoundscape.calibrate.CalibrationActivity;
-import com.talons.RNUPSoundscape.sessiontools.Serializer;
-import com.talons.RNUPSoundscape.sessiontools.SessionManager;
-import com.talons.RNUPSoundscape.viewdata.DataActivity;
+import com.talons.RNUPSoundscape.storagetools.Serializer;
+import com.talons.RNUPSoundscape.storagetools.SessionManager;
 
 import java.io.IOException;
 import java.text.DecimalFormat;

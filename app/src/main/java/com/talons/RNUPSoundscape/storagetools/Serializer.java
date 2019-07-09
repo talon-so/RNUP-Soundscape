@@ -1,4 +1,4 @@
-package com.talons.RNUPSoundscape.sessiontools;
+package com.talons.RNUPSoundscape.storagetools;
 
 import android.util.Base64;
 

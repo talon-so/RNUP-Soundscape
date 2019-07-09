@@ -1,6 +1,5 @@
 package com.talons.RNUPSoundscape.calibrate;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
@@ -20,9 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.talons.RNUPSoundscape.R;
-import com.talons.RNUPSoundscape.record.RecordActivity;
-import com.talons.RNUPSoundscape.sessiontools.Serializer;
-import com.talons.RNUPSoundscape.sessiontools.SessionManager;
+import com.talons.RNUPSoundscape.storagetools.Serializer;
+import com.talons.RNUPSoundscape.storagetools.SessionManager;
 
 import java.io.IOException;
 import java.text.DecimalFormat;

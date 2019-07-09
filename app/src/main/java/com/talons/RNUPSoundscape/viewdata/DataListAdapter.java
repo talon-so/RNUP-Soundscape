@@ -1,6 +1,5 @@
 package com.talons.RNUPSoundscape.viewdata;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.talons.RNUPSoundscape.R;
-import com.talons.RNUPSoundscape.sessiontools.StorageModel;
+import com.talons.RNUPSoundscape.storagetools.StorageModel;
 
 import java.util.List;
 

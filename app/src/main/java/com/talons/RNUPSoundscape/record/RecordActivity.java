@@ -32,7 +32,7 @@ import com.jaredrummler.android.device.DeviceName;
 import com.talons.RNUPSoundscape.R;
 import com.talons.RNUPSoundscape.R.layout;
 import com.talons.RNUPSoundscape.viewdata.DataActivity;
-import com.talons.RNUPSoundscape.sessiontools.StorageModel;
+import com.talons.RNUPSoundscape.storagetools.StorageModel;
 
 import java.lang.reflect.Field;
 
