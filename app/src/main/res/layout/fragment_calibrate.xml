@@ -19,20 +19,26 @@
         android:orientation="horizontal"
         android:layout_marginLeft="36dp"
         android:layout_marginRight="36dp">
-        <ImageButton
+        <Button
             android:id="@+id/subtract"
             android:layout_width="75dp"
-            android:layout_height="75dp" />
+            android:layout_height="75dp"
+            android:text="-"
+            android:background="#F8F8FF"
+            android:textSize="44dp"/>
         <TextView
             android:id="@+id/constant_textview"
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="48dp"
+            android:textSize="44dp"
             />
-        <ImageButton
+        <Button
             android:id="@+id/add"
             android:layout_alignParentRight="true"
+            android:text="+"
+            android:background="#F8F8FF"
+            android:textSize="40dp"
             android:layout_width="75dp"
             android:layout_height="75dp" />
     </RelativeLayout>

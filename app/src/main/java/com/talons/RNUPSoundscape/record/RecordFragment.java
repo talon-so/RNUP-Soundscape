@@ -155,6 +155,19 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
     public void onPause()
     {
         super.onPause();
+        // stop the recording if user is not in the current activity
+        if (recorder != null){
+            try {
+                recorder.stop();
+            } catch(RuntimeException e) {
+                //file.delete();  //you must delete the outputfile when the recorder stop failed.
+            } finally {
+                recorder.reset();    // set state to idle
+                recorder.release();  // release resources back to the system
+                recorder = null;
+                calibrateBtn.setOnClickListener( this );
+            }
+        }
     }
 
     private int seconds = 10;
@@ -203,13 +216,17 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
             public void run() {
                 if (tenthofSeconds > 0){
                     if (tenthofSeconds < 99) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // UI updation related code.
-                                recordBtn.setText( "Recording " + tenthofSeconds/10 );
-                            }
-                        });
+                        try {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // UI updation related code.
+                                    recordBtn.setText( "Recording " + tenthofSeconds/10 );
+                                }
+                            });
+                        } catch (NullPointerException e) {
+                            Log.i( "Calibration error: ", String.valueOf( e ) );
+                        }
                     }
                     Double maxAmplitude = getAmplitude() + sessionManager.getAmplitudeRef();
                     DecimalFormat df = new DecimalFormat();
@@ -217,15 +234,11 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
                     df.setMinimumFractionDigits(2);
                     textView.setText( df.format( maxAmplitude ));
                     totalDecibels += maxAmplitude;
-                    // subtract our counters
+                    // subtract our coulnters
                     tenthofSeconds--;
                     handler.postDelayed(this,100 );
                 } else {
                     stopRecording();
-                    // reset the recording seconds
-                    seconds = 10;
-                    tenthofSeconds = 100;
-                    recordBtn.setEnabled( true );
                     averageDecibels = totalDecibels/100;
                     // notify activity
                     try {
@@ -234,8 +247,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    totalDecibels = 0;
-                    averageDecibels = 0;
+                    resetRecording();
                 }
 
             }
@@ -243,6 +255,14 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
 
     }
 
+    private void resetRecording(){
+        // reset the recording seconds
+        seconds = 10;
+        tenthofSeconds = 100;
+        recordBtn.setEnabled( true );
+        totalDecibels = 0;
+        averageDecibels = 0;
+    }
     private void stopRecording() {
         try {
             recorder.stop();

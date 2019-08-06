@@ -48,18 +48,16 @@ public class CalibrationFragment extends Fragment implements View.OnClickListene
         return fragment;
     }
 
-    Serializer serializer;
-    SessionManager sessionManager;
+    private SessionManager sessionManager;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        serializer = new Serializer();
         sessionManager = new SessionManager( Objects.requireNonNull( getContext() ) );
     }
 
-    MediaRecorder recorder;
-    View view;
-    TextView textView;
+    private MediaRecorder recorder;
+    private View view;
+    private TextView textView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -72,14 +70,12 @@ public class CalibrationFragment extends Fragment implements View.OnClickListene
         return view;
     }
 
-    ImageButton  addBtn, subtractBtn;
-    Button calibrateBtn;
-    public void setOnClickListeners(){
-        calibrateBtn = view.findViewById(R.id.finish_button);
+    private void setOnClickListeners(){
+        Button calibrateBtn = view.findViewById( R.id.finish_button );
         calibrateBtn.setOnClickListener( this );
-        addBtn = view.findViewById( R.id.add );
+        Button addBtn = view.findViewById( R.id.add );
         addBtn.setOnClickListener( this );
-        subtractBtn = view.findViewById( R.id.subtract);
+        Button subtractBtn = view.findViewById( R.id.subtract );
         subtractBtn.setOnClickListener( this );
     }
     @Override
@@ -93,7 +89,7 @@ public class CalibrationFragment extends Fragment implements View.OnClickListene
         super.onDetach();
     }
 
-    final static int PERMISSION_ALL = 1;
+    private final static int PERMISSION_ALL = 1;
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -107,16 +103,6 @@ public class CalibrationFragment extends Fragment implements View.OnClickListene
         //if (!permissionToRecordAccepted ) finish();
     }
 
-    public boolean checkPermissions( String[] permissions){
-            if (permissions != null) {
-                for (String permission : permissions) {
-                    if (checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-    }
 
     /**
      * @return db a double with the decibel value of the current intake of mic audio
@@ -138,7 +124,7 @@ public class CalibrationFragment extends Fragment implements View.OnClickListene
 
     /**
      *  Checks if external storage is available for read and write
-     *  */
+     */
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -152,6 +138,9 @@ public class CalibrationFragment extends Fragment implements View.OnClickListene
         super.onPause();
     }
 
+    /**
+     * turn on media recorder to pick up audio from device and display decibels
+     */
     private void startCalibration(){
         recorder = new MediaRecorder();
         //recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -195,12 +184,10 @@ public class CalibrationFragment extends Fragment implements View.OnClickListene
         });
     }
 
-    public void onBackPressed() {
-        stopCalibration();
-        getActivity().finish();
-
-    }
-
+    /**
+     * updates session manager to show the local amount of calibration for the device
+     * @param calibrationConstant the amount of calibrated offset to send to session manager
+     */
     public void updateAmplitudeReference(int calibrationConstant) {
             sessionManager.setAmplitudeRef( calibrationConstant );
     }
@@ -218,11 +205,11 @@ public class CalibrationFragment extends Fragment implements View.OnClickListene
         }
 
     }
-    TextView constantTextview;
-    public void updateConstantTextView(){
+    private TextView constantTextview;
+    private void updateConstantTextView(){
         constantTextview.setText( Integer.toString(calibrationConstant) );
     }
-    int calibrationConstant = 0;
+    private int calibrationConstant = 0;
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
