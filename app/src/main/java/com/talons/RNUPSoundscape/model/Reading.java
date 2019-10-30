@@ -25,6 +25,62 @@ public class Reading implements Serializable
 
     }
 
+    public String getRequestSignature() {
+        return requestSignature;
+    }
+
+    public void setRequestSignature(String requestSignature) {
+        this.requestSignature = requestSignature;
+    }
+
+    public String getReportingDate() {
+        return reportingDate;
+    }
+
+    public void setReportingDate(String reportingDate) {
+        this.reportingDate = reportingDate;
+    }
+
+    public String getGpsLatitude() {
+        return gpsLatitude;
+    }
+
+    public void setGpsLatitude(String gpsLatitude) {
+        this.gpsLatitude = gpsLatitude;
+    }
+
+    public String getGpsLongitude() {
+        return gpsLongitude;
+    }
+
+    public void setGpsLongitude(String gpsLongitude) {
+        this.gpsLongitude = gpsLongitude;
+    }
+
+    public String getAverageDecibel() {
+        return averageDecibel;
+    }
+
+    public void setAverageDecibel(String averageDecibel) {
+        this.averageDecibel = averageDecibel;
+    }
+
+    public String getDeviceModel() {
+        return deviceModel;
+    }
+
+    public void setDeviceModel(String deviceModel) {
+        this.deviceModel = deviceModel;
+    }
+
+    public String getDeviceApiLevel() {
+        return deviceApiLevel;
+    }
+
+    public void setDeviceApiLevel(String deviceApiLevel) {
+        this.deviceApiLevel = deviceApiLevel;
+    }
+
     // Static class Builder
     public static class Builder {
 
@@ -79,8 +135,7 @@ public class Reading implements Serializable
 
         // build method to deal with outer class
         // to return outer instance
-        public Reading build()
-        {
+        public Reading build() {
             return new Reading(this);
         }
     }

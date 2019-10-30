@@ -126,8 +126,9 @@ public class CurrentDataFragment extends Fragment implements View.OnClickListene
                 .setGpsLat( String.valueOf(unit.getLatitude()) )
                 .setGpsLong( String.valueOf(unit.getLongitude()) )
                 .setReportingDate( unit.getStandardTime() )
-                .setRequestSignature( HMACGenerator.convertToSHA256( unit ) )
                 .build();
+        // set the sha256 signature
+        reading.setRequestSignature( HMACGenerator.convertToSHA256( reading ) );
         Call<Reading> call = client.createReading( reading );
         // Execute the call asynchronously. Get a positive or negative callback.
         call.enqueue( new Callback<Reading>() {
