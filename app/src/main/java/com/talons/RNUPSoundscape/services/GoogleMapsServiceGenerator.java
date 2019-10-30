@@ -1,13 +1,10 @@
-package com.talons.RNUPSoundscape;
+package com.talons.RNUPSoundscape.services;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/**
- * Created by frankxu on 2018-07-15.
- */
 
 public class GoogleMapsServiceGenerator {
 

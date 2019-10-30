@@ -9,7 +9,6 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -65,11 +64,11 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         sessionManager = new SessionManager( Objects.requireNonNull( getContext() ) );
     }
 
-    ImageButton calibrateBtn;
-    Button recordBtn;
-    MediaRecorder recorder;
-    View view;
-    TextView textView;
+
+
+    private MediaRecorder recorder;
+    private View view;
+    private TextView textView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -81,6 +80,8 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         return view;
     }
 
+    private Button recordBtn;
+    private ImageButton calibrateBtn;
     public void setOnClickListeners(){
         recordBtn = view.findViewById(R.id.button);
         recordBtn.setOnClickListener(this);
@@ -100,7 +101,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
 
     final static int PERMISSION_ALL = 1;
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode){
             case PERMISSION_ALL:
@@ -217,13 +218,10 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
                 if (tenthofSeconds > 0){
                     if (tenthofSeconds < 99) {
                         try {
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // UI updation related code.
-                                    recordBtn.setText( "Recording " + tenthofSeconds/10 );
-                                }
-                            });
+                            getActivity().runOnUiThread( () -> {
+                                // UI updation related code.
+                                recordBtn.setText( "Recording " + tenthofSeconds/10 );
+                            } );
                         } catch (NullPointerException e) {
                             Log.i( "Calibration error: ", String.valueOf( e ) );
                         }
@@ -234,7 +232,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
                     df.setMinimumFractionDigits(2);
                     textView.setText( df.format( maxAmplitude ));
                     totalDecibels += maxAmplitude;
-                    // subtract our coulnters
+                    // subtract our counters
                     tenthofSeconds--;
                     handler.postDelayed(this,100 );
                 } else {
@@ -267,7 +265,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener{
         try {
             recorder.stop();
         } catch(RuntimeException e) {
-            //mFile.delete();  //you must delete the outputfile when the recorder stop failed.
+                //mFile.delete();  //you must delete the outputfile when the recorder stop failed.
         } finally {
             recorder.reset();    // set state to idle
             recorder.release();  // release resources back to the system
