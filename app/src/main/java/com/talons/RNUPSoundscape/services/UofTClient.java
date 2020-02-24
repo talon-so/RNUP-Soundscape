@@ -8,7 +8,7 @@ import retrofit2.http.POST;
 
 public interface UofTClient {
 
-    @POST("/submit/reading")
+    @POST("/webservices/soundscape/submit/reading")
     Call<Reading> createReading(
             @Body Reading reading
     );

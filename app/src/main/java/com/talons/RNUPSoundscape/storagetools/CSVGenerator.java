@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
-import com.google.android.gms.auth.api.signin.internal.Storage;
+import com.talons.RNUPSoundscape.model.StorageModel;
 
 import java.io.FileWriter;
 import java.io.IOException;

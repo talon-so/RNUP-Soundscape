@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.gson.GsonBuilder;
 import com.talons.RNUPSoundscape.R;
 import com.talons.RNUPSoundscape.model.Reading;
 import com.talons.RNUPSoundscape.services.UofTClient;
@@ -18,7 +19,7 @@ import com.talons.RNUPSoundscape.services.UofTServiceGenerator;
 import com.talons.RNUPSoundscape.storagetools.HMACGenerator;
 import com.talons.RNUPSoundscape.storagetools.Serializer;
 import com.talons.RNUPSoundscape.storagetools.SessionManager;
-import com.talons.RNUPSoundscape.storagetools.StorageModel;
+import com.talons.RNUPSoundscape.model.StorageModel;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -134,7 +135,7 @@ public class CurrentDataFragment extends Fragment implements View.OnClickListene
         call.enqueue( new Callback<Reading>() {
             @Override
             public void onResponse(Call<Reading> call, Response<Reading> response) {
-                Log.i("Success", String.valueOf( response.body() ) );
+                Log.i("Success", String.valueOf(response.body()));
             }
             @Override
             public void onFailure(Call<Reading> call, Throwable t) {

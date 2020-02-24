@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -32,7 +31,7 @@ import com.jaredrummler.android.device.DeviceName;
 import com.talons.RNUPSoundscape.R;
 import com.talons.RNUPSoundscape.R.layout;
 import com.talons.RNUPSoundscape.viewdata.DataActivity;
-import com.talons.RNUPSoundscape.storagetools.StorageModel;
+import com.talons.RNUPSoundscape.model.StorageModel;
 
 import java.lang.reflect.Field;
 

@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.talons.RNUPSoundscape.R;
-import com.talons.RNUPSoundscape.storagetools.StorageModel;
+import com.talons.RNUPSoundscape.model.StorageModel;
 
 import java.util.List;
 

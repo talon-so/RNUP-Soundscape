@@ -15,7 +15,7 @@ import com.talons.RNUPSoundscape.R.layout;
 import com.talons.RNUPSoundscape.storagetools.CSVGenerator;
 import com.talons.RNUPSoundscape.storagetools.Serializer;
 import com.talons.RNUPSoundscape.storagetools.SessionManager;
-import com.talons.RNUPSoundscape.storagetools.StorageModel;
+import com.talons.RNUPSoundscape.model.StorageModel;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.talons.RNUPSoundscape.storagetools;
+package com.talons.RNUPSoundscape.model;
 
 
 import java.io.Serializable;
@@ -28,7 +28,7 @@ public class StorageModel implements Serializable {
      */
     public String getStandardTime(){
 
-        SimpleDateFormat date = new SimpleDateFormat("MM/dd/yy h:mma", Locale.CANADA);
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA);
         // call depart time method to input epoch time into formatter
         // we * by 1000 to convert Unix epoch time to epoch time (seconds to milliseconds)
         String dateStr = date.format( new Date( (this.epochSeconds) * 1000 ) );
